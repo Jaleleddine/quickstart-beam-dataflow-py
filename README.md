@@ -3,14 +3,14 @@
 *github.com/heerman*
 
 
-## Goal
+## Concept
 
 Run a your first Apache Beam pipeline, quickly, with Google Dataflow and Google Cloud Storage
 
 
-## 1. Setup Google Cloud
+## 1. Setup Google Account for Google Cloud Platform
 
-* Follow this Google tutorial (outlined below)
+* Configure Google Cloud Platform as described by the Google tutorial (and outlined below)
 
     * https://cloud.google.com/dataflow/docs/quickstarts/quickstart-python
 
@@ -50,7 +50,6 @@ Run a your first Apache Beam pipeline, quickly, with Google Dataflow and Google 
     * `sudo install —upgrade virtualenv`
 
     * `sudo install —upgrade setuptools`
-
 
 * Create a Python virtual environment
 
@@ -112,7 +111,7 @@ python -m apache_beam.examples.wordcount \
 
 ## 4. Apache Beam Snippets (Python)
 
-**virtual-env**
+### Python virtual-env
 ```
 virtualenv umgtechnical-env/  # Create a virtual-env
 
@@ -121,7 +120,7 @@ virtualenv umgtechnical-env/  # Create a virtual-env
 deactivate  # Deactivate a virtual-env
 ```
 
-**Run pipeline locally**
+### Run pipeline locally
 ```
 python $PYSCRIPT \
   --runner DirectRunner \
@@ -131,7 +130,7 @@ python $PYSCRIPT \
   --output streams_denorm.json
 ```
 
-**Run pipeline on Google Cloud**
+### Run pipeline on Google Cloud
 ```
 python $PYSCRIPT \
   --runner DataflowRunner \
@@ -145,26 +144,26 @@ python $PYSCRIPT \
   --output $BUCKET_OUT/streams_denorm_python.json
 ```
 
-**Read from a file**
+### Read from a file
 ```
 tracks = (p
   | 'tracks_import' >> ReadFromText('data/users.txt'))
 
 tracks = (p
-  | 'tracks_import' >> ReadFromText('gs://lwheerman_umg_dataengr_sourcedata/TechTest_files/users.gz'))
+  | 'tracks_import' >> ReadFromText('gs://gcp_project_name/gs_bucket/users.txt'))
 
 streams = (p
   | 'streams_import' >> ReadFromText(file_pattern=known_args.users, 
                                      compression_type=CompressionTypes.GZIP))
 ```
 
-**Write to a file**
+### Write to a file
 ```
 # Write output
 final_output | WriteToText(known_args.output)
 ```
 
-**Map Trasforms - Lambda or Passing in a Function**
+### Map Trasforms - Lambda or Passing in a Function
 ```
 streams_by_track = (p
   | 'reading_streams' >> ReadFromText('datasets/streams_trunc')
@@ -173,7 +172,7 @@ streams_by_track = (p
   | 'streams_track_map' >> beam.Map(lambda x:(x['track_id'], x)))
 ```
 
-**Custom DoFn, for a ParDo**
+### Custom DoFn, for a ParDo
 ```
 # Pull a field's value from JSON, and return a map of value-to-JSON
 class MapFieldValueToJson(beam.DoFn):
@@ -196,7 +195,10 @@ map_jkey_input1 = (pc1
   | 'from_json' >> beam.ParDo(MapFieldValueToJson(), "user_id"))
 ```
 
-**Custom PTransform, Usually for compound transform, could be for input/output 2 or more PCollections**
+### Custom PTransform
+* Usually for compound transform (sequence of transforms)
+* Also used for transforms that input 2 PCollections (ex: join)
+* Transforms that output multiple PCollections are possible too
 ```
 class JoinJsonDatasets(beam.PTransform):
 
