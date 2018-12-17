@@ -218,7 +218,7 @@ class JoinJsonDatasets(beam.PTransform):
 ```
 
 
-** Pipeline Example **
+**Pipeline Example**
 ```
 # Map functions
 def key_whitelist(element_map, whitelist):
